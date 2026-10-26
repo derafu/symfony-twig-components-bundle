@@ -1,0 +1,2 @@
+parameters:
+    derafu_twig_components.templates_dir: '%derafu_twig_components.package_dir%/resources/templates'

@@ -1,0 +1,54 @@
+{
+    "name": "derafu/symfony-twig-components-bundle",
+    "description": "Derafu: Symfony Twig Components Bundle - Native Symfony integration for Derafu UI components",
+    "type": "symfony-bundle",
+    "homepage": "https://www.derafu.dev/docs/symfony/twig-components-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Esteban De La Fuente Rubio / Derafu",
+            "homepage": "https://www.derafu.dev"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/derafu/symfony-twig-components-bundle/issues",
+        "source": "https://github.com/derafu/symfony-twig-components-bundle"
+    },
+    "autoload": {
+        "psr-4": {
+            "Derafu\\TwigComponentsBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Derafu\\TestsTwigComponentsBundle\\": "tests/src/",
+            "Derafu\\TestsTwigComponentsBundle\\Fixture\\": "tests/fixtures/"
+        }
+    },
+    "require": {
+        "php": "^8.5",
+        "derafu/symfony-translation-bundle": "dev-main",
+        "derafu/twig-components": "dev-main",
+        "symfony/config": "^8.1",
+        "symfony/dependency-injection": "^8.1",
+        "symfony/framework-bundle": "^8.1",
+        "symfony/http-kernel": "^8.1",
+        "symfony/twig-bundle": "^8.1",
+        "symfony/ux-twig-component": "^2.36",
+        "symfony/yaml": "^8.1"
+    },
+    "require-dev": {
+        "ext-xdebug": "*",
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^2.3",
+        "phpunit/phpunit": "^13.4"
+    },
+    "scripts": {
+        "tests": "XDEBUG_MODE=coverage vendor/bin/phpunit --configuration=phpunit.xml",
+        "phpcs-fix": "vendor/bin/php-cs-fixer fix -v --config=php-cs-fixer.php",
+        "phpcs": "vendor/bin/php-cs-fixer fix -v --dry-run --diff --config=php-cs-fixer.php",
+        "phpstan": "vendor/bin/phpstan analyse --configuration=phpstan.neon --memory-limit=1G"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

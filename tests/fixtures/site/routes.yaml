@@ -1,0 +1,3 @@
+components:
+    path: /components
+    controller: Derafu\TestsTwigComponentsBundle\Fixture\Controller::index
