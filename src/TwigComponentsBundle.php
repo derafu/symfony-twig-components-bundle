@@ -14,6 +14,7 @@ namespace Derafu\TwigComponentsBundle;
 
 use Composer\InstalledVersions;
 use Derafu\TwigComponentsBundle\DependencyInjection\Compiler\TemplatePathsPass;
+use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -27,6 +28,24 @@ final class TwigComponentsBundle extends AbstractBundle
     {
         parent::build($container);
         $container->addCompilerPass(new TemplatePathsPass());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prependExtension(ContainerConfigurator $configurator, ContainerBuilder $container): void
+    {
+        if (!interface_exists(AssetMapperInterface::class)) {
+            return;
+        }
+
+        $container->prependExtensionConfig('framework', [
+            'asset_mapper' => [
+                'paths' => [
+                    InstalledVersions::getInstallPath('derafu/twig-components') . '/resources/css' => 'derafu-twig-components/css',
+                ],
+            ],
+        ]);
     }
 
     /** @param array<string, mixed> $config */

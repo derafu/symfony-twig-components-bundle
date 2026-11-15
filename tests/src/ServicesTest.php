@@ -13,6 +13,7 @@ use Derafu\TwigComponentsBundle\DependencyInjection\Compiler\TemplatePathsPass;
 use Derafu\TwigComponentsBundle\TwigComponentsBundle;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -78,6 +79,40 @@ final class ServicesTest extends TestCase
         $bundle = new TwigComponentsBundle();
         self::assertSame(dirname(__DIR__, 2), $bundle->getPath());
         self::assertSame('derafu_twig_components', $bundle->getContainerExtension()?->getAlias());
+    }
+
+    public function testStylesheetImportsResolveToVersionedComponentAssets(): void
+    {
+        (new Filesystem())->mkdir($this->project . '/assets');
+        $this->kernel = new Kernel($this->project, assetMapper: true);
+        $this->kernel->boot();
+        $mapper = $this->kernel->getContainer()->get('test.asset_mapper');
+        self::assertInstanceOf(AssetMapperInterface::class, $mapper);
+
+        $stylesheet = $mapper->getAsset('derafu-twig-components/css/components.css');
+        self::assertNotNull($stylesheet);
+        self::assertNotNull($stylesheet->content);
+        $resources = InstalledVersions::getInstallPath('derafu/twig-components') . '/resources/css';
+        self::assertSame(realpath($resources . '/components.css'), realpath($stylesheet->sourcePath));
+        self::assertCount(37, $stylesheet->getDependencies());
+        foreach ($stylesheet->getDependencies() as $dependency) {
+            self::assertSame(
+                realpath($resources . '/components/' . basename($dependency->sourcePath)),
+                realpath($dependency->sourcePath)
+            );
+            self::assertNotSame($dependency->publicPathWithoutDigest, $dependency->publicPath);
+            self::assertStringContainsString(basename($dependency->publicPath), $stylesheet->content);
+        }
+        $html = $this->twig()->createTemplate('<link rel="stylesheet" href="{{ asset("derafu-twig-components/css/components.css") }}">')->render();
+        self::assertMatchesRegularExpression('/components-[a-zA-Z0-9_-]+\.css/', $html);
+        self::assertNull($mapper->getAsset('derafu-twig-components/config/twig-components-services.yaml'));
+    }
+
+    public function testApplicationCanDisableAssetMapper(): void
+    {
+        $this->kernel->boot();
+        self::assertFalse($this->kernel->getContainer()->has('asset_mapper'));
+        self::assertStringContainsString('A native Derafu component', $this->twig()->render('page.html.twig'));
     }
 
     public function testPackageYamlCompilesAndItsComponentsRemainPrivate(): void

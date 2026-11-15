@@ -18,8 +18,11 @@ use Twig\Environment;
 /** A real application with no Content, Derafu renderer or Derafu Twig service. */
 final class Kernel extends BaseKernel
 {
-    public function __construct(private readonly string $project, private readonly bool $bundleFirst = false)
-    {
+    public function __construct(
+        private readonly string $project,
+        private readonly bool $bundleFirst = false,
+        private readonly bool $assetMapper = false,
+    ) {
         parent::__construct('test', true);
     }
 
@@ -49,6 +52,10 @@ final class Kernel extends BaseKernel
                 'http_method_override' => false,
                 'handle_all_throwables' => true,
                 'php_errors' => ['log' => false],
+                'assets' => $this->assetMapper,
+                'asset_mapper' => $this->assetMapper ? [
+                    'paths' => [$this->project . '/assets' => ''],
+                ] : false,
             ]);
             $container->loadFromExtension('twig', [
                 'default_path' => $this->project . '/templates',
@@ -63,6 +70,9 @@ final class Kernel extends BaseKernel
                 $container->setAlias('test.' . $id, $id)->setPublic(true);
             }
             $container->setAlias('test.environment', Environment::class)->setPublic(true);
+            if ($this->assetMapper) {
+                $container->setAlias('test.asset_mapper', 'asset_mapper')->setPublic(true);
+            }
         });
     }
 
