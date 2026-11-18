@@ -21,8 +21,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Derafu\\TestsTwigComponentsBundle\\": "tests/src/",
-            "Derafu\\TestsTwigComponentsBundle\\Fixture\\": "tests/fixtures/"
+            "Derafu\\TestsTwigComponentsBundle\\": "tests/src/"
         }
     },
     "require": {
